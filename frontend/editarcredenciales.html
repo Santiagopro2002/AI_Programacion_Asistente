@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Credenciales</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #133840;
+        }
+        .container {
+            max-width: 500px;
+            margin-top: 50px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .btn-custom {
+            background-color: #04BFAD;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #039d90;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3 class="mb-4 text-center">Editar Credenciales</h3>
+
+    <form onsubmit="guardarCambios(event)">
+        <div class="mb-3">
+            <label class="form-label">Nombre:</label>
+            <input type="text" class="form-control" id="nombre_usuario" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Correo:</label>
+            <input type="email" class="form-control" id="correo" required>
+        </div>
+
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="cambiarContrasena" onchange="togglePasswordFields()">
+            <label class="form-check-label" for="cambiarContrasena">Cambiar contraseña</label>
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label class="form-label">Nueva Contraseña:</label>
+            <input type="password" class="form-control" id="contrasena" disabled>
+            <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3" onclick="togglePassword('contrasena', this)" style="cursor:pointer;"></i>
+        </div>
+
+        <div class="mb-3 position-relative">
+            <label class="form-label">Repetir Nueva Contraseña:</label>
+            <input type="password" class="form-control" id="repetir_contrasena" disabled>
+            <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3" onclick="togglePassword('repetir_contrasena', this)" style="cursor:pointer;"></i>
+        </div>
+
+        <button type="submit" class="btn btn-custom w-100">Guardar Cambios</button>
+    </form>
+
+    <div class="text-center mt-3">
+        <a href="preguntas.html" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+<script>
+function togglePassword(idCampo, icon) {
+    const input = document.getElementById(idCampo);
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    } else {
+        input.type = "password";
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    }
+}
+
+function togglePasswordFields() {
+    const cambiar = document.getElementById("cambiarContrasena").checked;
+    document.getElementById("contrasena").disabled = !cambiar;
+    document.getElementById("repetir_contrasena").disabled = !cambiar;
+}
+</script>
+
+<script>
+async function cargarDatosUsuario() {
+    const id_usuario = localStorage.getItem('id_usuario');
+    if (!id_usuario) return;
+
+    try {
+        const respuesta = await fetch(`http://localhost:5000/obtener_usuario/${id_usuario}`);
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            document.getElementById('nombre_usuario').value = datos.nombre_usuario;
+            document.getElementById('correo').value = datos.correo;
+        } else {
+            Swal.fire({ icon: 'error', title: 'Error al cargar datos', text: datos.error });
+        }
+    } catch (error) {
+        Swal.fire({ icon: 'error', title: 'Conexión fallida', text: 'No se pudieron cargar los datos.' });
+    }
+}
+
+window.addEventListener('DOMContentLoaded', cargarDatosUsuario);
+</script>
+
+<script>
+async function guardarCambios(event) {
+    event.preventDefault();
+
+    const id_usuario = localStorage.getItem('id_usuario');
+    const nombre_usuario = document.getElementById('nombre_usuario').value.trim();
+    const correo = document.getElementById('correo').value.trim();
+    const cambiar = document.getElementById('cambiarContrasena').checked;
+
+    if (!nombre_usuario || !correo) {
+        return Swal.fire({ icon: 'warning', title: 'Campos requeridos', text: 'Debes llenar nombre y correo.' });
+    }
+
+    let contrasena = "";
+
+    if (cambiar) {
+        const nueva = document.getElementById('contrasena').value.trim();
+        const repetir = document.getElementById('repetir_contrasena').value.trim();
+
+        if (!nueva || !repetir) {
+            return Swal.fire({ icon: 'warning', title: 'Faltan contraseñas', text: 'Debes llenar ambas contraseñas.' });
+        }
+
+        if (nueva !== repetir) {
+            return Swal.fire({ icon: 'error', title: 'No coinciden', text: 'Las contraseñas no son iguales.' });
+        }
+
+        contrasena = nueva;
+    }
+
+    try {
+        const respuesta = await fetch(`http://localhost:5000/editar_usuario/${id_usuario}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre_usuario, correo, contrasena })
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            Swal.fire({
+                icon: "success",
+                title: "Datos actualizados",
+                confirmButtonText: "Aceptar"
+            }).then(() => {
+                localStorage.setItem('nombre_usuario', nombre_usuario);
+                window.location.href = "preguntas.html";
+            });
+        } else {
+            Swal.fire({ icon: "error", title: "Error", text: datos.error || "No se pudo actualizar." });
+        }
+    } catch (error) {
+        Swal.fire({ icon: "error", title: "Error de conexión", text: "No se pudo contactar al servidor." });
+    }
+}
+</script>
+
+</body>
+</html>

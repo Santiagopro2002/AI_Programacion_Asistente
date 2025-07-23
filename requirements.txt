@@ -1,0 +1,10 @@
+flask
+mysql-connector-python
+python-dotenv
+requests
+openai
+flask-cors
+google-generativeai
+Werkzeug
+cohere
+redis
