@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="shortcut icon" href="../frontend/logo_ia-dark.png" type="image/x-icon">
+
 
     <style>
         body {
@@ -189,7 +191,7 @@
     const id_usuario = localStorage.getItem('id_usuario');
 
     try {
-        const res = await fetch('http://localhost:5000/crear_sesion', {
+        const res = await fetch('http://54.205.129.177:5000/crear_sesion', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_usuario, nombre_sesion: 'Sesión ' + new Date().toLocaleString() })
@@ -237,7 +239,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function crearSesion() {
     try {
-        const res = await fetch('http://localhost:5000/crear_sesion', {
+        const res = await fetch('http://54.205.129.177:5000/crear_sesion', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_usuario, nombre_sesion: 'Sesión ' + new Date().toLocaleString() })
@@ -257,7 +259,7 @@ async function crearSesion() {
 // Mostrar lista de sesiones del usuario
 async function mostrarHistorial() {
     try {
-        const res = await fetch(`http://localhost:5000/listar_sesiones/${id_usuario}`);
+        const res = await fetch(`http://54.205.129.177:5000/listar_sesiones/${id_usuario}`);
         const sesiones = await res.json();
 
         const lista = document.getElementById('listaHistorial');
@@ -281,7 +283,7 @@ async function cargarSesion(id) {
     localStorage.setItem('id_sesion', id_sesion);
 
     try {
-        const res = await fetch(`http://localhost:5000/historial/${id_usuario}/${id_sesion}`);
+        const res = await fetch(`http://54.205.129.177:5000/historial/${id_usuario}/${id_sesion}`);
         const historial = await res.json();
 
         const contenedor = document.getElementById('chatContainer');
@@ -305,7 +307,7 @@ async function enviarPregunta() {
     const writing = agregarMensaje('La IA está escribiendo...', 'ia', true);
 
     try {
-        const res = await fetch('http://localhost:5000/preguntas', {
+        const res = await fetch('http://54.205.129.177:5000/preguntas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_usuario, pregunta, id_sesion })
@@ -350,7 +352,7 @@ function agregarMensaje(texto, tipo, temporal = false) {
 
 // Exportar historial (TXT)
 function exportarHistorial() {
-    window.open(`http://localhost:5000/exportar/${id_usuario}`, '_blank');
+    window.open(`http://54.205.129.177:5000/exportar/${id_usuario}`, '_blank');
 }
 
 // Cerrar sesión
