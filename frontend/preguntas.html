@@ -191,7 +191,7 @@
     const id_usuario = localStorage.getItem('id_usuario');
 
     try {
-        const res = await fetch('http://54.205.129.177:5000/crear_sesion', {
+        const res = await fetch('http://34.228.220.157:5000/crear_sesion', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_usuario, nombre_sesion: 'Sesión ' + new Date().toLocaleString() })
@@ -239,7 +239,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function crearSesion() {
     try {
-        const res = await fetch('http://54.205.129.177:5000/crear_sesion', {
+        const res = await fetch('http://34.228.220.157:5000/crear_sesion', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_usuario, nombre_sesion: 'Sesión ' + new Date().toLocaleString() })
@@ -259,7 +259,7 @@ async function crearSesion() {
 // Mostrar lista de sesiones del usuario
 async function mostrarHistorial() {
     try {
-        const res = await fetch(`http://54.205.129.177:5000/listar_sesiones/${id_usuario}`);
+        const res = await fetch(`http://34.228.220.157:5000/listar_sesiones/${id_usuario}`);
         const sesiones = await res.json();
 
         const lista = document.getElementById('listaHistorial');
@@ -283,7 +283,7 @@ async function cargarSesion(id) {
     localStorage.setItem('id_sesion', id_sesion);
 
     try {
-        const res = await fetch(`http://54.205.129.177:5000/historial/${id_usuario}/${id_sesion}`);
+        const res = await fetch(`http://34.228.220.157:5000/historial/${id_usuario}/${id_sesion}`);
         const historial = await res.json();
 
         const contenedor = document.getElementById('chatContainer');
@@ -307,7 +307,7 @@ async function enviarPregunta() {
     const writing = agregarMensaje('La IA está escribiendo...', 'ia', true);
 
     try {
-        const res = await fetch('http://54.205.129.177:5000/preguntas', {
+        const res = await fetch('http://34.228.220.157:5000/preguntas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_usuario, pregunta, id_sesion })
@@ -352,7 +352,7 @@ function agregarMensaje(texto, tipo, temporal = false) {
 
 // Exportar historial (TXT)
 function exportarHistorial() {
-    window.open(`http://54.205.129.177:5000/exportar/${id_usuario}`, '_blank');
+    window.open(`http://34.228.220.157:5000/exportar/${id_usuario}`, '_blank');
 }
 
 // Cerrar sesión
