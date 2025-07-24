@@ -1,270 +1,376 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Asistente IA</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #EAEAEA;
-      color: #1A1A1A;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente IA - Preguntas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="shortcut icon" href="logo_ia-dark.ico" type="image/x-icon">
 
-    .sidebar {
-      background-color: #1A1A1A;
-      color: #EAEAEA;
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: -250px;
-      width: 250px;
-      z-index: 2000;
-      overflow-y: auto;
-      transition: left 0.3s;
-      padding: 1rem;
-    }
 
-    .sidebar.show {
-      left: 0;
-    }
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
 
-    .sidebar .nav-link {
-      color: #EAEAEA;
-      margin: 10px 0;
-    }
+        .sidebar {
+            width: 240px;
+            background-color: #133840;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+        }
 
-    .sidebar .nav-link:hover {
-      background-color: #333;
-      border-radius: 5px;
-      padding-left: 10px;
-    }
+        .sidebar .nav-link {
+            color: white;
+            text-decoration: none;
+        }
 
-    .topbar {
-      background-color: #1A1A1A;
-      color: #EAEAEA;
-      padding: 10px 15px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+        .sidebar .nav-link:hover {
+            background-color: #0f2d33;
+            border-radius: 8px;
+            padding-left: 10px;
+            transition: all 0.2s;
+        }
 
-    .chat-container {
-      margin-left: 0;
-      padding: 20px;
-      height: calc(100vh - 60px);
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
+        .sidebar a {
+            text-decoration: none;
+        }
 
-    .message {
-      padding: 12px 18px;
-      border-radius: 20px;
-      margin-bottom: 12px;
-      max-width: 70%;
-      word-wrap: break-word;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
+        @media (max-width: 768px) {
+            .sidebar span {
+                display: none; /* En móvil solo se ven iconos */
+            }
+            .sidebar {
+                width: 115px;
+                text-align: center;
+                padding: 10px;
+            }
+        }
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .user-message {
-      background-color: #0B3D3C;
-      color: white;
-      align-self: flex-end;
-      justify-content: flex-end;
-      text-align: right;
-    }
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .ia-message {
-      background-color: #4d694b;
-      color: white;
-      align-self: flex-start;
-    }
+        .message {
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            max-width: 70%;
+            word-wrap: break-word;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
 
-    .input-area {
-      background-color: #EAEAEA;
-      padding: 10px;
-      display: flex;
-      gap: 10px;
-      border-top: 1px solid #ccc;
-    }
+        .user-message {
+            background-color: #133840;
+            color: white;
+            align-self: flex-end;        /* Usuario a la derecha */
+            justify-content: flex-end;
+            text-align: right;
+        }
 
-    .btn-enviar {
-      background-color: #0B3D3C;
-      color: white;
-      border: none;
-    }
+        .ia-message {
+            background-color: #04BFAD;
+            color: white;
+            align-self: flex-start;      /* IA a la izquierda */
+        }
 
-    .btn-enviar:hover {
-      background-color: #093332;
-    }
+        .input-area {
+            padding: 10px 20px;
+            background: white;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #ccc;
+        }
 
-    .message-icon {
-      font-size: 1.5rem;
-    }
+        .input-area input {
+            flex: 1;
+        }
 
-    @media (min-width: 768px) {
-      .chat-container {
-        margin-left: 250px;
-      }
-    }
+        .message-icon {
+            font-size: 1.5rem;
+        }
 
-    pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      margin: 0;
-    }
-  </style>
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+        }
+        .dropdown-menu {
+            background-color: #133840;
+        }
+        .dropdown-item:hover {
+            background-color: #0f2d33;
+        }
+    </style>
 </head>
 <body>
-  <div class="topbar">
-    <button class="btn btn-sm btn-light d-md-none" onclick="toggleSidebar()">
-      <i class="bi bi-list"></i>
-    </button>
-    <span class="fw-bold">Asistente IA</span>
-  </div>
 
-  <div class="sidebar" id="sidebar">
-    <h5>Menú</h5>
-    <hr style="border-color: #555;">
-    <a href="#" class="nav-link" onclick="alert('Nueva sesión')"><i class="bi bi-plus-circle me-2"></i> Nueva Sesión</a>
-    <a href="#" class="nav-link" onclick="alert('Editar credenciales')"><i class="bi bi-pencil me-2"></i> Editar Credenciales</a>
-    <a href="#" class="nav-link" onclick="alert('Exportar historial')"><i class="bi bi-download me-2"></i> Exportar Historial</a>
-    <a href="#" class="nav-link text-danger" onclick="alert('Cerrar sesión')"><i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión</a>
-  </div>
+<div class="sidebar d-flex flex-column justify-content-between">
+    <div>
+        <img src="logo_ia-dark.png" alt="img" style="width: 150px; height: 60px; text-align: center;">
+        <h5 id="Bienvenido" class="d-none d-md-block">Bienvenido:</h5>
+        <p id="nombreUsuario" class="text-center fw-bold d-none d-md-block">Usuario</p>
 
-  <div class="chat-container" id="chatContainer">
-    <div class="message user-message">
-      <span class="message-icon">🧑</span>
-      <pre>dame la suma de 10 números</pre>
+
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <a href="#" onclick="nuevaSesion()" class="nav-link text-white d-flex align-items-center">
+                    <i class="bi bi-plus-circle me-2"></i> <span class="d-none d-md-inline">Nueva Sesión</span>
+                </a>
+            </li>
+            <li class="nav-item dropdown mb-2">
+                <a class="nav-link text-white d-flex align-items-center dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-gear me-2"></i> 
+                    <span class="d-none d-md-inline">Configuración</span>
+                </a>
+                <ul class="dropdown-menu bg-dark border-0">
+                    <li>
+                        <a class="dropdown-item text-white" href="editarcredenciales.html">
+                            <i class="bi bi-pencil-square me-2"></i> Editar Credenciales
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white" href="#" onclick="exportarHistorial()">
+                            <i class="bi bi-file-earmark-text me-2"></i> Exportar Chat
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+        <hr>
+        <div id="listaHistorial" style="margin-top: 20px; max-height: 350px; overflow-y: auto;">
+            <!-- Aquí se insertará el historial -->
+        </div>
+
     </div>
-    <div class="message ia-message">
-      <span class="message-icon">🤖</span>
-      <pre>Para poder calcular la suma de 10 números, necesito que me proporciones esos 10 números específicos...</pre>
+
+    <ul class="nav flex-column">
+        <li>
+            <a href="#" onclick="cerrarSesion()" class="nav-link text-danger d-flex align-items-center">
+                <i class="bi bi-box-arrow-right me-2"></i> <span class="d-none d-md-inline">Cerrar Sesión</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+<div class="chat-area">
+    <div class="chat-container" id="chatContainer">
+        <!-- Mensajes irán apareciendo aquí -->
     </div>
-  </div>
 
-  <div class="input-area">
-    <input type="text" class="form-control" placeholder="Escribe tu pregunta..." />
-    <button class="btn btn-enviar">Enviar</button>
-  </div>
+    <div class="input-area">
+        <input type="text" class="form-control" id="pregunta" placeholder="Escribe tu pregunta...">
+        <button class="btn btn-success" onclick="enviarPregunta()">Enviar</button>
+    </div>
+</div>
 
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('show');
-    }
-  </script>
-  <script>
-    function toggleSidebar() {
-      document.getElementById("sidebar").classList.toggle("collapsed");
-      document.getElementById("mainContent").classList.toggle("expanded");
-    }
-    
-    document.getElementById('nombreUsuario').textContent = localStorage.getItem('nombre_usuario') || 'Usuario';
-    
-    let id_usuario = localStorage.getItem('id_usuario');
-    let id_sesion = localStorage.getItem('id_sesion');
-    
-    window.addEventListener('DOMContentLoaded', () => {
-      mostrarHistorial();
-      cargarHistorial();
-    });
-    
+
+<script>
     async function nuevaSesion() {
-      const res = await fetch('http://34.228.220.157:5000/crear_sesion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_usuario, nombre_sesion: 'Sesión ' + new Date().toLocaleString() })
-      });
-      const datos = await res.json();
-      if (res.ok) {
-        id_sesion = datos.id_sesion;
-        localStorage.setItem('id_sesion', id_sesion);
-        document.getElementById('chatContainer').innerHTML = '';
-        mostrarHistorial();
-        Swal.fire("¡Sesión creada con éxito!", "", "success");
-      }
-    }
-    
-    async function mostrarHistorial() {
-      const res = await fetch(`http://34.228.220.157:5000/listar_sesiones/${id_usuario}`);
-      const sesiones = await res.json();
-      const lista = document.getElementById('listaHistorial');
-      lista.innerHTML = '<h6 class="text-white">Sesiones anteriores:</h6>';
-      sesiones.forEach(sesion => {
-        const btn = document.createElement('button');
-        btn.textContent = sesion.nombre_sesion;
-        btn.className = 'btn btn-sm btn-outline-light mb-1 w-100 text-start';
-        btn.onclick = () => cargarSesion(sesion.id);
-        lista.appendChild(btn);
-      });
-    }
-    
-    async function cargarSesion(id) {
-      id_sesion = id;
-      localStorage.setItem('id_sesion', id_sesion);
-      const res = await fetch(`http://34.228.220.157:5000/historial/${id_usuario}/${id_sesion}`);
-      const historial = await res.json();
-      const container = document.getElementById('chatContainer');
-      container.innerHTML = '';
-      historial.forEach(m => {
-        agregarMensaje(m.pregunta, 'user');
-        agregarMensaje(m.respuesta, 'ia');
-      });
-    }
-    
-    function agregarMensaje(texto, tipo, temporal = false) {
-      const contenedor = document.getElementById('chatContainer');
-      const div = document.createElement('div');
-      div.className = `message ${tipo}-message`;
-      const icon = document.createElement('span');
-      icon.className = 'message-icon';
-      icon.textContent = tipo === 'user' ? '🥷🏽' : '🤖';
-      const content = document.createElement('pre');
-      content.textContent = texto;
-      div.appendChild(icon);
-      div.appendChild(content);
-      contenedor.appendChild(div);
-      contenedor.scrollTop = contenedor.scrollHeight;
-      return temporal ? div : null;
-    }
-    
-    async function enviarPregunta() {
-      const pregunta = document.getElementById('pregunta').value.trim();
-      if (!pregunta || !id_usuario || !id_sesion) return;
-      agregarMensaje(pregunta, 'user');
-      const writing = agregarMensaje('La IA está escribiendo...', 'ia', true);
-      try {
-        const res = await fetch('http://34.228.220.157:5000/preguntas', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id_usuario, pregunta, id_sesion })
+    const id_usuario = localStorage.getItem('id_usuario');
+
+    try {
+        const res = await fetch('http://34.228.220.157:5000/crear_sesion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_usuario, nombre_sesion: 'Sesión ' + new Date().toLocaleString() })
         });
         const datos = await res.json();
+
+        if (res.ok) {
+            const id_sesion = datos.id_sesion;
+            localStorage.setItem('id_sesion', id_sesion);
+
+            // Limpia el chat
+            const contenedor = document.getElementById('chatContainer');
+            contenedor.innerHTML = '';
+
+            // Vuelve a cargar el listado de sesiones
+            mostrarHistorial();
+            Swal.fire({
+            title: "seción creada con exito!",
+            icon: "success",
+            draggable: true
+            });
+        }
+    } catch (error) {
+        console.error('Error creando sesión:', error);
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "no se puedo cargra nueva seción!",
+            footer: '<a href="#">Why do I have this issue?</a>'
+            });
+    }
+}
+
+// Mostrar nombre del usuario
+document.getElementById('nombreUsuario').textContent = localStorage.getItem('nombre_usuario') || 'Usuario';
+
+let id_usuario = localStorage.getItem('id_usuario');
+let id_sesion = localStorage.getItem('id_sesion');
+
+// Mostrar sesiones al cargar la página
+window.addEventListener('DOMContentLoaded', () => {
+    mostrarHistorial();  // solo carga el historial de sesiones
+    cargarHistorial();   // carga el historial de la sesión activa si existe
+});
+
+async function crearSesion() {
+    try {
+        const res = await fetch('http://34.228.220.157:5000/crear_sesion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_usuario, nombre_sesion: 'Sesión ' + new Date().toLocaleString() })
+        });
+        const datos = await res.json();
+        if (res.ok) {
+            id_sesion = datos.id_sesion;
+            localStorage.setItem('id_sesion', id_sesion);
+        }
+    } catch (error) {
+        console.error('Error creando sesión:', error);
+    }
+}
+
+
+
+// Mostrar lista de sesiones del usuario
+async function mostrarHistorial() {
+    try {
+        const res = await fetch(`http://34.228.220.157:5000/listar_sesiones/${id_usuario}`);
+        const sesiones = await res.json();
+
+        const lista = document.getElementById('listaHistorial');
+        lista.innerHTML = '<h6 class="text-white">Sesiones anteriores:</h6>';
+
+        sesiones.forEach(sesion => {
+            const boton = document.createElement('button');
+            boton.textContent = sesion.nombre_sesion;
+            boton.className = 'btn btn-sm btn-outline-light mb-1 w-100 text-start';
+            boton.onclick = () => cargarSesion(sesion.id);
+            lista.appendChild(boton);
+        });
+    } catch (e) {
+        alert('Error cargando el historial');
+    }
+}
+
+// Cargar el historial de una sesión
+async function cargarSesion(id) {
+    id_sesion = id;
+    localStorage.setItem('id_sesion', id_sesion);
+
+    try {
+        const res = await fetch(`http://34.228.220.157:5000/historial/${id_usuario}/${id_sesion}`);
+        const historial = await res.json();
+
+        const contenedor = document.getElementById('chatContainer');
+        contenedor.innerHTML = '';
+
+        historial.forEach(m => {
+            agregarMensaje(m.pregunta, 'user');
+            agregarMensaje(m.respuesta, 'ia');
+        });
+    } catch (e) {
+        alert('Error cargando la sesión');
+    }
+}
+
+// Enviar pregunta
+async function enviarPregunta() {
+    const pregunta = document.getElementById('pregunta').value.trim();
+    if (!pregunta || !id_usuario || !id_sesion) return;
+
+    agregarMensaje(pregunta, 'user');
+    const writing = agregarMensaje('La IA está escribiendo...', 'ia', true);
+
+    try {
+        const res = await fetch('http://34.228.220.157:5000/preguntas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_usuario, pregunta, id_sesion })
+        });
+
+        const datos = await res.json();
         writing.remove();
-        agregarMensaje(datos.respuesta || '❌ Error consultando la IA.', 'ia');
-      } catch {
+
+        if (res.ok && datos.respuesta) {
+            agregarMensaje(datos.respuesta, 'ia');
+        } else {
+            agregarMensaje('❌ Error consultando la IA.', 'ia');
+        }
+    } catch (error) {
         writing.remove();
         agregarMensaje('❌ Error de conexión.', 'ia');
-      }
-      document.getElementById('pregunta').value = '';
     }
-    
-    function exportarHistorial() {
-      window.open(`http://34.228.220.157:5000/exportar/${id_usuario}`, '_blank');
-    }
-    
-    function cerrarSesion() {
-      localStorage.clear();
-      window.location.href = 'index.html';
-    }
-    </script>
+
+    document.getElementById('pregunta').value = '';
+}
+
+// Crear burbujas de mensajes
+function agregarMensaje(texto, tipo, temporal = false) {
+    const contenedor = document.getElementById('chatContainer');
+    const div = document.createElement('div');
+    div.className = `message ${tipo}-message`;
+
+    const icon = document.createElement('span');
+    icon.className = 'message-icon';
+    icon.textContent = tipo === 'user' ? '🥷🏽' : '🤖';
+
+    const content = document.createElement('pre');
+    content.textContent = texto;
+
+    div.appendChild(icon);
+    div.appendChild(content);
+    contenedor.appendChild(div);
+    contenedor.scrollTop = contenedor.scrollHeight;
+
+    return temporal ? div : null;
+}
+
+// Exportar historial (TXT)
+function exportarHistorial() {
+    window.open(`http://34.228.220.157:5000/exportar/${id_usuario}`, '_blank');
+}
+
+// Cerrar sesión
+function cerrarSesion() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+}
+
+// No implementados aún
+function abrirConfiguracion() {
+    alert('Configuración aún no implementada.');
+}
+
+function editarCredenciales() {
+    alert('Edición de credenciales aún no implementada.');
+}
+</script>
+
+
 </body>
 </html>
