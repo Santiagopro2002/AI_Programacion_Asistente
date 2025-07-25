@@ -101,7 +101,7 @@ async function cargarDatosUsuario() {
     if (!id_usuario) return;
 
     try {
-        const respuesta = await fetch(`http://34.228.220.157:5000/obtener_usuario/${id_usuario}`);
+        const respuesta = await fetch(`http://18.206.239.52:5000/obtener_usuario/${id_usuario}`);
         const datos = await respuesta.json();
 
         if (respuesta.ok) {
@@ -149,7 +149,7 @@ async function guardarCambios(event) {
     }
 
     try {
-        const respuesta = await fetch(`http://34.228.220.157:5000/editar_usuario/${id_usuario}`, {
+        const respuesta = await fetch(`http://18.206.239.52:5000/editar_usuario/${id_usuario}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nombre_usuario, correo, contrasena })
